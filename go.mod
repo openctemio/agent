@@ -9,7 +9,7 @@ require (
 	github.com/projectdiscovery/httpx v1.9.0
 	github.com/projectdiscovery/katana v1.5.0
 	github.com/projectdiscovery/naabu/v2 v2.6.0
-	github.com/projectdiscovery/subfinder/v2 v2.13.0
+	github.com/projectdiscovery/subfinder/v2 v2.14.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 

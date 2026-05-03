@@ -367,8 +367,8 @@ github.com/projectdiscovery/retryablehttp-go v1.3.8 h1:TA075ioaVyaM65R3dSzKSbOCi
 github.com/projectdiscovery/retryablehttp-go v1.3.8/go.mod h1:/vas835LvB4aqK9vCPGSgKF7Q7hY/BRcIJ/TgM2sPAY=
 github.com/projectdiscovery/stringsutil v0.0.2 h1:uzmw3IVLJSMW1kEg8eCStG/cGbYYZAja8BH3LqqJXMA=
 github.com/projectdiscovery/stringsutil v0.0.2/go.mod h1:EJ3w6bC5fBYjVou6ryzodQq37D5c6qbAYQpGmAy+DC0=
-github.com/projectdiscovery/subfinder/v2 v2.13.0 h1:RHf5vl54V6RNH//Pxhoh/wOptc1w7mde/GD8RPUw+JI=
-github.com/projectdiscovery/subfinder/v2 v2.13.0/go.mod h1:mtbBMU/wLFTg/z9BoM5c6OE9MUvQSTrw7WqLbFpJ0pw=
+github.com/projectdiscovery/subfinder/v2 v2.14.0 h1:lTi9tNEqSPFOKcswh62MDVEV8yO5qCJU75ccLcW7Anc=
+github.com/projectdiscovery/subfinder/v2 v2.14.0/go.mod h1:3XBFCLD/9R8KWK5zfu3u1Qau02shuCiQuCV3W2ClUmk=
 github.com/projectdiscovery/tlsx v1.2.2 h1:Y96QBqeD2anpzEtBl4kqNbwzXh2TrzJuXfgiBLvK+SE=
 github.com/projectdiscovery/tlsx v1.2.2/go.mod h1:ZJl9F1sSl0sdwE+lR0yuNHVX4Zx6tCSTqnNxnHCFZB4=
 github.com/projectdiscovery/uncover v1.2.0 h1:31tjYa0v8FB8Ch8hJTxb+2t63vsljdOo0OSFylJcX4M=
