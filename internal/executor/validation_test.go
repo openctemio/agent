@@ -18,7 +18,7 @@ func TestProbeReachability_OpenPortDetected(t *testing.T) {
 	if err != nil {
 		t.Fatalf("listen: %v", err)
 	}
-	defer ln.Close()
+	defer func() { _ = ln.Close() }()
 
 	outcome, _, ev := probeReachability(context.Background(), []string{ln.Addr().String()}, 2*time.Second, nil)
 	if outcome != "detected" {
