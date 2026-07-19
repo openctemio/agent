@@ -4,7 +4,7 @@ go 1.26
 
 require (
 	github.com/openctemio/sdk-go v0.5.2
-	github.com/projectdiscovery/dnsx v1.2.3
+	github.com/projectdiscovery/dnsx v1.3.0
 	github.com/projectdiscovery/goflags v0.1.74
 	github.com/projectdiscovery/httpx v1.10.0
 	github.com/projectdiscovery/katana v1.6.1
@@ -96,11 +96,11 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/projectdiscovery/asnmap v1.1.1 // indirect
 	github.com/projectdiscovery/blackrock v0.0.1 // indirect
-	github.com/projectdiscovery/cdncheck v1.2.42 // indirect
+	github.com/projectdiscovery/cdncheck v1.2.44 // indirect
 	github.com/projectdiscovery/chaos-client v0.5.2 // indirect
 	github.com/projectdiscovery/clistats v0.1.4 // indirect
 	github.com/projectdiscovery/dsl v0.8.20 // indirect
-	github.com/projectdiscovery/fastdialer v0.5.11 // indirect
+	github.com/projectdiscovery/fastdialer v0.5.13 // indirect
 	github.com/projectdiscovery/freeport v0.0.7 // indirect
 	github.com/projectdiscovery/gologger v1.1.71 // indirect
 	github.com/projectdiscovery/gostruct v0.0.2 // indirect
@@ -109,11 +109,11 @@ require (
 	github.com/projectdiscovery/ipranger v0.0.53 // indirect
 	github.com/projectdiscovery/machineid v0.0.0-20250715113114-c77eb3567582 // indirect
 	github.com/projectdiscovery/mapcidr v1.1.97 // indirect
-	github.com/projectdiscovery/networkpolicy v0.1.41 // indirect
+	github.com/projectdiscovery/networkpolicy v0.1.42 // indirect
 	github.com/projectdiscovery/ratelimit v0.0.88 // indirect
 	github.com/projectdiscovery/rawhttp v0.1.90 // indirect
 	github.com/projectdiscovery/retryabledns v1.0.115 // indirect
-	github.com/projectdiscovery/retryablehttp-go v1.3.16 // indirect
+	github.com/projectdiscovery/retryablehttp-go v1.3.18 // indirect
 	github.com/projectdiscovery/tlsx v1.2.2 // indirect
 	github.com/projectdiscovery/uncover v1.2.0 // indirect
 	github.com/projectdiscovery/useragent v0.0.108 // indirect
