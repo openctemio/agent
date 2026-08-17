@@ -1,3 +1,5 @@
+//go:build platform
+
 package main
 
 import "testing"
