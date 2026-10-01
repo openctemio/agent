@@ -320,7 +320,7 @@ inside archives (on by default).
   other's rule-set differences.
 - The platform maps reports from older sensors (`tool: gitleaks`) to
   `betterleaks` at ingest and migrates scan configs and existing findings
-  (API migration 000240).
+  (API migration 000241).
 
 ## Building
 
