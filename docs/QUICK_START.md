@@ -369,8 +369,10 @@ export API_URL=http://host.docker.internal:8080
    regenerated (*Settings → Sensors*). Regenerate the key and update `API_KEY`.
    With `-key-autorenew` the current key is in the `-credentials` file, not
    in `API_KEY`.
-5. A sensor that is **deactivated** is not rejected: it keeps heartbeating,
-   logs `paused by platform`, takes no jobs, and resumes when reactivated.
+5. A running sensor that is **deactivated** is not rejected: it keeps
+   heartbeating, logs `paused by platform`, takes no jobs, and resumes when
+   reactivated. In v0.3.0 a sensor *started* while deactivated exits with
+   `Invalid API key`; reactivate it before restarting.
 
 ---
 
