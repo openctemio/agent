@@ -1024,18 +1024,26 @@ func countLines(data []byte) int {
 	return count
 }
 
+// maxReconTargets bounds one recon job's target list; the control plane caps a
+// run far below this.
+const maxReconTargets = 10000
+
 // mergeTargets combines the single target and the target list, in order,
-// without duplicates or blanks.
+// without duplicates or blanks, keeping at most maxReconTargets.
 func mergeTargets(target string, targets []string) []string {
-	seen := make(map[string]bool, len(targets)+1)
-	out := make([]string, 0, len(targets)+1)
-	for _, t := range append([]string{target}, targets...) {
+	seen := make(map[string]bool)
+	var out []string
+	add := func(t string) {
 		t = strings.TrimSpace(t)
-		if t == "" || seen[t] {
-			continue
+		if t == "" || seen[t] || len(out) >= maxReconTargets {
+			return
 		}
 		seen[t] = true
 		out = append(out, t)
+	}
+	add(target)
+	for _, t := range targets {
+		add(t)
 	}
 	return out
 }
