@@ -267,8 +267,11 @@ func main() {
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-sigCh
-		fmt.Println("\nShutting down...")
+		fmt.Println("\nShutting down... (running scans get a grace period; signal again to stop at once)")
 		cancel()
+		<-sigCh
+		fmt.Println("Stopping at once: running scans are killed and left to the platform's recovery")
+		os.Exit(130)
 	}()
 
 	// Platform mode - run as managed platform sensor
@@ -892,6 +895,11 @@ func runOnce(ctx context.Context, cfg *Config, apiClient *client.Client, pusher 
 }
 
 func runDaemon(ctx context.Context, cfg *Config, apiClient *client.Client, pusher core.Pusher, opts daemonOptions) {
+	drainGrace, err := resolveDrainGrace(os.Getenv(envDrainGrace))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(2)
+	}
 	// Create sensor
 	sensorName := cfg.Sensor.Name
 	if sensorName == "" {
@@ -1109,6 +1117,7 @@ func runDaemon(ctx context.Context, cfg *Config, apiClient *client.Client, pushe
 		// memory) and its tools' learned cost, at most the operator's cap.
 		resources := newResourceManager(cfg, opts.StateDir, workspace.Roots())
 		poller = core.NewCommandPoller(apiClient, cmdExecutor, &core.CommandPollerConfig{
+			DrainGrace:    drainGrace,
 			PollInterval:  pollInterval,
 			MaxConcurrent: resources.MaxSlots(),
 			AllowedTypes:  allowedTypes,
@@ -1151,12 +1160,18 @@ func runDaemon(ctx context.Context, cfg *Config, apiClient *client.Client, pushe
 		fmt.Println("Sensor stopped.")
 		return
 	}
+	// pollerDone closes when the poller has drained: running commands
+	// finished, or were stopped and released, after the drain grace.
+	pollerDone := make(chan struct{})
 	if poller != nil {
 		go func() {
+			defer close(pollerDone)
 			if err := poller.Start(ctx); err != nil && err != context.Canceled {
 				fmt.Fprintf(os.Stderr, "Command poller error: %v\n", err)
 			}
 		}()
+	} else {
+		close(pollerDone)
 	}
 
 	// Start sensor
@@ -1193,9 +1208,18 @@ func runDaemon(ctx context.Context, cfg *Config, apiClient *client.Client, pushe
 		keyRenewManager.Stop()
 	}
 
-	// Stop poller
+	// Drain the poller: it claims nothing more, lets running commands
+	// finish for the drain grace, then stops them (killing their process
+	// groups) and releases them to the platform so another sensor takes
+	// them at once (api RFC-030). The commands do not run under ctx, so the
+	// signal does not kill them; wait here until that is done.
 	if poller != nil {
 		poller.Stop()
+		if st := poller.QueueStats(); st.Claimed > 0 {
+			fmt.Printf("Draining: %d command(s) running; up to %s before they are stopped and handed back to the platform (%s)\n",
+				st.Claimed, drainGrace, envDrainGrace)
+		}
+		<-pollerDone
 	}
 
 	// Undelivered results stay in the outbox for the next start.
