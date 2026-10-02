@@ -48,7 +48,7 @@ ARG PIP_VERSION
 
 # Pinned with its whole dependency set in docker/semgrep-constraints.txt (see
 # the main Dockerfile: semgrep 1.93.0 broke on setuptools >= 81).
-ARG SEMGREP_VERSION=1.178.0
+ARG SEMGREP_VERSION=1.179.0
 
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \

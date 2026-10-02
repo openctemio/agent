@@ -89,7 +89,7 @@ ARG TARGETARCH
 # (bump both together). semgrep 1.93.0 pulled opentelemetry-instrumentation
 # 0.46b0, which imports pkg_resources; setuptools >= 81 removed it, so
 # `semgrep` died with ModuleNotFoundError in every published image.
-ARG SEMGREP_VERSION=1.178.0
+ARG SEMGREP_VERSION=1.179.0
 # Betterleaks (gitleaks' successor) v1.x: v2 changes the JSON report the
 # sensor parses. The archive SHA-256 per architecture is pinned here (from the
 # release's checksums.txt, itself signed: checksums.txt.sigstore.json); bump
