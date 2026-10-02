@@ -47,6 +47,7 @@ type Settings struct {
 	NucleiArchiveURL   string
 	NucleiChecksumsURL string
 	NucleiLatestURL    string
+	NucleiTagURL       string
 	NucleiVersion      string
 	NucleiSHA256       string
 	NucleiDir          string
@@ -116,6 +117,7 @@ func SettingsFromEnv(lookup func(string) (string, bool)) (Settings, error) {
 		if s.NucleiLatestURL == "" {
 			s.NucleiLatestURL = DefaultNucleiLatestURL
 		}
+		s.NucleiTagURL = DefaultNucleiTagURL
 	}
 	s.NucleiVersion = get(EnvNucleiVersion)
 	s.NucleiSHA256 = strings.ToLower(get(EnvNucleiSHA256))
@@ -179,7 +181,7 @@ func NewFromSettings(s Settings, tools Tools, verbose bool) (*Manager, error) {
 	}
 	if tools.Nuclei {
 		n := &NucleiTemplates{
-			LatestURL: s.NucleiLatestURL, ArchiveURL: s.NucleiArchiveURL, ChecksumsURL: s.NucleiChecksumsURL,
+			LatestURL: s.NucleiLatestURL, TagURL: s.NucleiTagURL, ArchiveURL: s.NucleiArchiveURL, ChecksumsURL: s.NucleiChecksumsURL,
 			LocalDir: s.NucleiDir, Version: s.NucleiVersion, SHA256: s.NucleiSHA256, MinTemplates: s.NucleiMin,
 			Fetcher: fetcher,
 		}
