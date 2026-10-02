@@ -207,3 +207,24 @@ func (fixedParser) CanParse([]byte) bool       { return true }
 func (f fixedParser) Parse(context.Context, []byte, *core.ParseOptions) (*ctis.Report, error) {
 	return &ctis.Report{Tool: &ctis.Tool{Name: f.tool}}, nil
 }
+
+// A version an older sensor installed under a pin, dated at its fetch time
+// and without the pinned flag, does not block the move back to the latest.
+func TestLegacyFetchDatedVersionIsNoRollbackFloor(t *testing.T) {
+	src := newFake()
+	m := newTestManager(t, src)
+	src.set("v10.4.8", "sha256:8", time.Now().UTC())
+	m.Refresh(context.Background(), nil, false)
+	st := m.store(src.name)
+	meta, _ := st.readMeta(st.currentID())
+	meta.Pinned = false
+	up := meta.FetchedAt
+	meta.UpdatedAt = &up // dated at fetch, as the first release did
+	if err := writeJSON(st.metaPath(meta.ID), meta, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	src.set("v10.4.9", "sha256:9", time.Date(2026, 9, 16, 14, 58, 45, 0, time.UTC))
+	if res := m.Refresh(context.Background(), nil, false); res[0].Err != nil || !res[0].Refreshed {
+		t.Fatalf("stuck on the fetch-dated version: %+v", res)
+	}
+}

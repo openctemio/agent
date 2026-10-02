@@ -456,7 +456,7 @@ func (m *Manager) doRefresh(ctx context.Context, name string, force bool) Result
 	}
 	// Anti-rollback: never replace content with older content unless the
 	// policy pins exactly that version.
-	if cur != nil && !cur.Pinned && pin.Version == "" && meta.UpdatedAt != nil && cur.UpdatedAt != nil &&
+	if cur != nil && !cur.Pinned && datedByPublisher(cur) && pin.Version == "" && meta.UpdatedAt != nil && cur.UpdatedAt != nil &&
 		meta.UpdatedAt.Before(*cur.UpdatedAt) {
 		res.Err = fmt.Errorf("verify: the source offers %s, older than the installed %s (refusing a rollback; pin the version to install it)",
 			meta.UpdatedAt.UTC().Format(time.RFC3339), cur.UpdatedAt.UTC().Format(time.RFC3339))
@@ -491,6 +491,17 @@ func (m *Manager) doRefresh(ctx context.Context, name string, force bool) Result
 	m.cfg.Logf("%s: now %s (%s)", name, meta.Version, firstNonEmpty(meta.Digest, meta.Source))
 	m.gc(name)
 	return res
+}
+
+// datedByPublisher reports whether a version's updated_at is a publication
+// date. A version whose date is its own install time (one installed under a
+// pin by an older sensor, dated at fetch) is no floor for anti-rollback.
+func datedByPublisher(m *Meta) bool {
+	if m.UpdatedAt == nil {
+		return false
+	}
+	d := m.UpdatedAt.Sub(m.FetchedAt)
+	return d < -time.Minute || d > time.Minute
 }
 
 // sameContent reports whether a fetched version is the installed one: the
