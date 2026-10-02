@@ -1014,15 +1014,6 @@ func runDaemon(ctx context.Context, cfg *Config, apiClient *client.Client, pushe
 		sensor.SetCapabilityReporter(newCapabilityReporter(cfg, contentMgr.Decorate))
 	}
 
-	// Connection check: the first heartbeat. While the platform rejects the
-	// key the daemon stays up and retries with a capped backoff (the SDK
-	// logs each attempt) instead of exiting into a restart loop; it carries
-	// on by itself once the key is accepted (sensor re-activated).
-	if apiClient != nil && !waitForAcceptedKey(ctx, sensor.FirstHeartbeat, sleepCtx) {
-		fmt.Println("Sensor stopped.")
-		return
-	}
-
 	// Start command poller if enabled
 	var poller *core.CommandPoller
 	if cfg.Sensor.EnableCommands && apiClient != nil {
@@ -1135,13 +1126,6 @@ func runDaemon(ctx context.Context, cfg *Config, apiClient *client.Client, pushe
 		// so the platform's dispatch sees this sensor's real load.
 		sensor.SetLoadReporter(poller)
 
-		// Start poller in background
-		go func() {
-			if err := poller.Start(ctx); err != nil && err != context.Canceled {
-				fmt.Fprintf(os.Stderr, "Command poller error: %v\n", err)
-			}
-		}()
-
 		if doorbell != nil {
 			fmt.Printf("  Command polling: on the heartbeat doorbell (fixed %s interval with a server that sends no hints)\n", pollInterval)
 		} else {
@@ -1152,6 +1136,27 @@ func runDaemon(ctx context.Context, cfg *Config, apiClient *client.Client, pushe
 		} else {
 			fmt.Printf("  Concurrent jobs: %d now (from CPU, memory and tool costs; cap with %s)\n", resources.Slots(0), envMaxJobs)
 		}
+	}
+
+	// Connection check: the first heartbeat. While the platform rejects the
+	// key the daemon stays up and retries with a capped backoff (the SDK
+	// logs each attempt) instead of exiting into a restart loop; it carries
+	// on by itself once the key is accepted (sensor re-activated).
+	//
+	// It is sent after the poller is set up (it carries the capability and
+	// load report: max_concurrent_jobs, capacity) and before the poller
+	// starts, so the platform knows this sensor's capacity before its first
+	// poll (api RFC-030).
+	if apiClient != nil && !waitForAcceptedKey(ctx, sensor.FirstHeartbeat, sleepCtx) {
+		fmt.Println("Sensor stopped.")
+		return
+	}
+	if poller != nil {
+		go func() {
+			if err := poller.Start(ctx); err != nil && err != context.Canceled {
+				fmt.Fprintf(os.Stderr, "Command poller error: %v\n", err)
+			}
+		}()
 	}
 
 	// Start sensor
