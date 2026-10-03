@@ -43,6 +43,32 @@ image. Both are gated on the tag — nothing is published without one.
 - sdk-go pinned to the commit of the openctemio/sdk-go PR "signed
   custom-template manifests, more refused nuclei flags, capped scan limits"
   (to become the next tag).
+### Fixed: a pipeline step's settings reach naabu and nuclei
+
+A platform pipeline step's config (for example `ports: "80"` for naabu, or
+`tags` for nuclei) had no effect: the SDK's command executor dropped every
+config key but `allow_interactsh` and `exclude`, so every step ran with the
+tool's defaults. With sdk-go's typed settings (api RFC-038; pinned to the
+sdk-go commit until its next tag) naabu and nuclei now declare what a scan
+may set, and each value maps to one specific flag of a per-scan copy of the
+tool:
+
+| Tool | Key | Flag | Rules |
+|---|---|---|---|
+| naabu | `ports` | `-p` / `-top-ports` | a port list (`80,443,8000-8100`, ports 1-65535) or `top-100`, `top-1000`, `full` |
+| naabu | `top_ports` | `-top-ports` | 100 or 1000; not together with `ports` |
+| naabu | `exclude_ports` | `-exclude-ports` | a port list |
+| naabu | `rate` | `-rate` | can only lower the sensor's rate, never raise it |
+| naabu | `retries` | `-retries` | 0-10 |
+| nuclei | `tags` | `-tags` | lowercase tags; `dos`, `fuzz`, `fuzzing`, `intrusive` refused |
+| nuclei | `exclude_tags` | `-etags` | added to the sensor's exclusions, never replacing them |
+| nuclei | `severity` | `-severity` | `info` to `critical`, `unknown` |
+
+A value outside these rules fails the command before the tool runs (no
+flag, separator or newline can get through). Template paths, protocols
+(code, file, headless), proxies, interaction servers, output paths, the
+naabu scan type and nmap are not settable. Other config keys are reported
+in the result's `ignored_config_keys` instead of vanishing.
 
 ## [v0.7.0] — 2026-10-03
 
